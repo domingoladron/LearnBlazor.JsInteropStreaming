@@ -1,0 +1,42 @@
+﻿@page "/"
+@inject IJSRuntime JsRuntime
+<PageTitle>Let's Learn Blazor:  JSInterop File Streaming</PageTitle>
+
+<h1>Let's stream an upload!</h1>
+<InputFile id="file-input" /><br/>
+<button onclick="saveFileToBlazor()" title="Upload image to blazor">Upload image to blazor</button>
+
+@code {
+
+    private DotNetObjectReference<Index> _blazorPageReference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _blazorPageReference = DotNetObjectReference.Create(this);
+        await JsRuntime.InvokeAsync<object>("setBlazorPageReference", _blazorPageReference);
+        
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    [JSInvokable]
+    public async Task<string> SaveFile(string fileName, string fileType)
+    {
+        var dataReference = 
+            await JsRuntime.InvokeAsync<IJSStreamReference>("fileDataStream");
+        await using var dataReferenceStream = 
+            await dataReference.OpenReadStreamAsync(maxAllowedSize: 10_000_000);
+
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", fileName);
+
+        var createdFile = File.Create(filePath);
+        await dataReferenceStream.CopyToAsync(createdFile);
+        createdFile.Close();
+        await Task.CompletedTask;
+
+        return $"new file {fileName} created in wwwroot/uploads";
+    }
+
+
+
+}
+
