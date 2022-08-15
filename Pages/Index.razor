@@ -1,5 +1,4 @@
 ﻿@page "/"
-@inject IJSRuntime JsRuntime
 <PageTitle>Let's Learn Blazor:  JSInterop File Streaming</PageTitle>
 
 <h1>Let's stream an upload!</h1>
@@ -7,6 +6,8 @@
 <button onclick="saveFileToBlazor()" title="Upload image to blazor">Upload image to blazor</button>
 
 @code {
+
+    [Inject] public IJSRuntime JsRuntime { get; set; }
 
     private DotNetObjectReference<Index> _blazorPageReference;
 
