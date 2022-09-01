@@ -1,4 +1,5 @@
-﻿@page "/"
+﻿@implements IDisposable
+@page "/"
 <PageTitle>Let's Learn Blazor:  JSInterop File Streaming</PageTitle>
 
 <h1>Let's stream an upload!</h1>
@@ -38,6 +39,10 @@
     }
 
 
+    public void Dispose()
+    {
+        _blazorPageReference.Dispose();
+    }
 
 }
 
